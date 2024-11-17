@@ -1,0 +1,83 @@
+#+title: 4 Defining Functions
+
+* 4-1
+#+begin_src haskell
+halve :: [a] -> ([a], [a])
+halve xs = (take (length xs / 2) xs, drop (length xs / 2) xs)
+
+halve [1,2,3,4,5,6]
+#+end_src
+
+#+RESULTS:
+
+* 4-2
+*** a.
+third xs = head (tail (tail xs))
+
+*** b.
+third xs = xs !! 2
+
+*** c.
+third xs [_:_:x:_] = x
+
+* 4-3
+*** a.
+safetail xs = if (null xs == True) then []
+              else tail xs
+
+*** b.
+safetail xs | null xs == True = []
+            | otherwise = tail xs
+
+*** c.
+safetail []
+safetail [_:xs] = xs
+
+* 4-4
+True || True = True
+True || False = True
+False || True = True
+False || False = False
+
+or
+
+False || False = False
+_ || _ = True
+
+* 4-5
+#+begin_src haskell
+a && b = if (a == True) then
+           if (b == True) then
+             True
+           else False
+         else False
+#+end_src
+
+* 4-6
+#+begin_src haskell
+a && b = if (a == True) then b
+         else False
+
+True && True
+#+end_src
+
+#+RESULTS:
+: True
+
+** 4-7
+#+begin_src haskell
+\x -> (\y -> (z -> x * y * z))
+#+end_src
+
+** 4-8
+#+begin_src haskell
+luhnDouble :: Int -> Int
+luhnDouble n = if (nDouble > 9) then nDouble - 9
+               else nDouble
+               where nDouble = 2 * n
+
+luhn :: Int -> Int -> Int -> Int -> Bool
+luhn a b c d = if (sum `mod` 10 == 0) then True
+               else False
+               where sum = (luhnDouble a) + b + (luhnDouble c) + d
+#+end_src

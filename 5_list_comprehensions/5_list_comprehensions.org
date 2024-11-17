@@ -1,0 +1,134 @@
+#+title: 5 List Comprehensions
+
+* 5-1
+#+begin_src haskell
+sum [x^2 | x <- [1..100]]
+#+end_src
+
+#+RESULTS:
+: 338350
+
+* 5-2
+#+begin_src haskell
+grid :: Int -> Int -> [(Int, Int)]
+grid m x = [(x,y) | x <- [0..m], y <- [0..n]]
+
+grid 1 2
+#+end_src
+
+* 5-3
+#+begin_src haskell
+square :: Int -> [(Int, Int)]
+square n = [(x,y) | (x,y) <- grid n n, x /= y]
+
+square 2
+#+end_src
+
+* 5-4
+#+begin_src haskell
+myReplicate :: Int -> a -> [a]
+myReplicate num x = [x | _ <- [1..num]]
+
+myReplicate 3 True
+#+end_src
+
+#+RESULTS:
+| True | True | True |
+
+* 5-5
+#+begin_src haskell :results raw
+pyhts :: Int -> [(Int, Int, Int)]
+pyths lim = [(x,y,z) | x <- [1..lim], y <- [1..lim], z <- [1..lim], x^2 + y^2 == z^2]
+
+pyths 10
+#+end_src
+
+#+RESULTS:
+[(3,4,5),(4,3,5),(6,8,10),(8,6,10)]
+
+* 5-6
+#+begin_src haskell :results raw
+factors :: Int -> [Int]
+factors n = [x | x <- [1..n], n `mod` x == 0]
+
+perfects :: Int -> [Int]
+perfects lim = [x | x <- [1..lim], (sum (factors x) - x) == x]
+
+perfects 500
+#+end_src
+
+#+RESULTS:
+[6,28,496]
+
+* 5-7
+#+begin_src haskell :results raw
+[(x,y) | x <- [1,2], y <- [3,4]]
+#+end_src
+
+#+RESULTS:
+[(1,3),(1,4),(2,3),(2,4)]
+
+#+begin_src haskell :results raw
+concat [[(x, y) | y <- [3, 4]] | x <- [1, 2]]
+#+end_src
+
+#+RESULTS:
+[(1,3),(1,4),(2,3),(2,4)]
+
+The inner comprehension =[(x, y) | y <- [3, 4]]= generates a list of pairs (x, y)
+for a fixed value of x and for every y in [3, 4]. The outer comprehension
+=[[…] | x <- [1, 2]]= generates a list of lists, where each inner list is the
+result of the inner comprehension for a specific value of x. Finally the
+=concat= function flattens the list of lists into a single list.
+
+* 5-8
+#+begin_src
+positions :: Eq a => a -> [a] -> [Int]
+positions x xs = [i | (x’,i) <- zip xs [0..], x == x’]
+#+end_src
+
+#+begin_src haskell
+find :: Eq a => a -> [(a,b)] -> [b]
+find k t = [v | (key,v) <- t, k == key]
+
+positions :: Eq a => a -> [a] -> [Int]
+positions x xs = find x (zip xs [0..])
+
+positions False [True, False, True, False]
+#+end_src
+
+#+RESULTS:
+[1,3]
+
+* 5-9
+#+begin_src haskell
+scalarproduct :: [Int] -> [Int] -> Int
+scalarproduct xs ys = sum [x*y | (x,y) <- zip xs ys]
+
+scalarproduct [1,2,3] [4,5,6]
+#+end_src
+
+#+RESULTS:
+32
+
+* 5-10
+#+begin_src haskell
+import Data.Char
+
+let2int :: Char -> Int
+let2int c = ord c - ord 'a'
+
+int2let :: Int -> Char
+int2let n = chr (ord 'a' + n)
+
+shift :: Int -> Char -> Char
+:{
+shift n c | isLower c = int2let ((let2int c + n) `mod` 26)
+          | otherwise = int2let ((let2int c + n + 32) `mod` 26)
+:}
+
+shift 3 'A'
+#+end_src
+
+#+RESULTS:
+'d'

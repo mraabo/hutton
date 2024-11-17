@@ -1,0 +1,36 @@
+#+title: 2 First Steps
+* 2-1
+Worked through examples.
+
+* 2-2
+(2^3) * 4
+(2 * 3) + (4 * 5)
+2 + (3 * (4^5))
+
+* 2-3
+#+begin_src haskell
+func :: Int -> Int
+func x = a ´div´ length xs where
+      a = 10
+      xs = [1, 2, 3, 4, 5]
+func 0
+#+end_src
+
+#+RESULTS:
+
+changed variable name to =n= since they are not allowed to begin with uppercase.
+#+RESULTS:
+
+* 2-4
+`last xs` could be defined in terms of:
+
+drop (length xs - 1)
+or
+xs !! (length xs - 1)
+
+* 2-5
+`init xs` could be defined in terms of:
+
+take (length xs - 1)
+or
+reverse (tail (reverse xs))

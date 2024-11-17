@@ -1,0 +1,37 @@
+#+title: 3 Types And Classes
+* 3-1
+['a', 'b', 'c'] :: [Char]
+('a', 'b', 'c') :: (Char, Char, Char)
+[(False, 'O'), (True, '1')] :: [(Bool, Char)]
+([False, True], ['0', '1']) :: ([Bool], [Char])
+[tail, init, reverse] :: [[a] -> [a]]
+
+* 3-2
+bools = [True, False]
+nums = [[1, 2]]
+add n1 n2 n3 = n1 + n2 + n3
+copy x = (x, x)
+apply f a = f a
+
+* 3-3
+second :: [a] -> a
+swap :: (a, b) -> (b, a)
+pair :: a -> b -> (a, b)
+double :: Num a => a -> a
+palindrome :: [a] -> Bool
+twice :: a -> (a -> a) -> (a -> a -> a)
+
+* 3-4
+#+begin_src haskell
+let a = ['a', 'b', 'c']
+:t a
+#+end_src
+
+#+RESULTS:
+
+* 3-5
+It is not feasible to check if two functions ALWAYS return the same results for
+the same argument since this requires the compiler to simulate all possible
+arguments. Another approach would be to see if the functions were syntactically
+identical, which would be a useless test, since the user would already know if
+they copy-pasted a function-body.
