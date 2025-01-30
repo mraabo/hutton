@@ -178,24 +178,25 @@ prune n (Node x ts) = Node x [prune (n - 1) t | t <- ts]
 depth :: Int
 depth = 9
 
-minimax :: Tree Grid -> Tree (Grid, Player)
-minimax (Node g [])
-  | wins O g = Node (g, O) []
-  | wins X g = Node (g, X) []
-  | otherwise = Node (g, B) []
-minimax (Node g ts)
-  | turn g == O = Node (g, minimum ps) ts'
-  | turn g == X = Node (g, maximum ps) ts'
-  where
-    ts' = map minimax ts
-    ps = [p | Node (_, p) _ <- ts']
+-- task d
+minimaxAB :: Tree Grid -> Tree (Grid, Player)
+minimaxAB (Node grid [])
+ | wins O grid = Node (grid, O) []
+ | wins X grid = Node (grid, X) []
+ | otherwise = Node (grid, B) []
+minimaxAB (Node grid (child:siblings)) = Node (grid, bestMove currTurn players) subtrees
+ where
+   currTurn = turn grid
+   subtrees = map minimaxAB (child:siblings)
+   players = [p | Node (_, p) _ <- subtrees]
+   bestMove player = if player == O then minimum else maximum
 
--- task c
+-- task c+d
 bestmove :: Grid -> Player -> Tree Grid -> Grid
 bestmove g p gt = head [g' | Node (g', p') _ <- ts, p' == best]
   where
     tree = findNode g gt
-    Node (_, best) ts = minimax tree
+    Node (_, best) ts = minimaxAB tree
 
 -- Part a+b
 main :: IO ()
