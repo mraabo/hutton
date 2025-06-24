@@ -16,10 +16,8 @@ func x = a ´div´ length xs where
 func 0
 #+end_src
 
-#+RESULTS:
 
 changed variable name to =n= since they are not allowed to begin with uppercase.
-#+RESULTS:
 
 * 2-4
 `last xs` could be defined in terms of:
