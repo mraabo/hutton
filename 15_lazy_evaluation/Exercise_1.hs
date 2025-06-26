@@ -16,5 +16,5 @@ Redexes in (\x -> 1 + x) (2*3):
 (\x -> 1 + x) (2*3): outermost
 2*3: innermost
 
-
+The solution in the book for some reason only recognise the leftmost innermost redexes as actual innermost redexes.
 -}
