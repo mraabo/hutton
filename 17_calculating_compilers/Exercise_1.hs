@@ -46,55 +46,88 @@ exec (comp' Throw c) s
 exec c (eval Throw : s)
 = {apply eval}
 exec c (Nothing : s)
-where we see that
-comp' Throw c = Nothing
+= {Using PUSH definition}
+exec (PUSH Nothing c) s
+where we see from start to end that
+comp' Throw c = PUSH Nothing c
 
-TODO: fix induction of ADD
 Inductive case of Add x y:
 exec (comp' (Add x y) c) s
 = {apply eq 2}
 exec c (eval (Add x y) : s)
-= {apply eval, which branches into three cases}
+= {define the operations in eval in terms of applicatives}
+ exec c (((+) <*> eval y <*> eval x) : s)
+= {define data Code = ADD Code, where ADD :: Code -> Code
+   and define exec (ADD c) (n:m:s) = exec c (((+) <*> n <*> m): s)}
+exec (ADD c) (eval y : eval x : s)
+= {induction hypothesis on y}
+exec (comp' y (ADD c)) (eval x : s)
+= {induction hypothesis on x}
+exec (comp' x (comp' y (ADD c))) s
+where we see from the initial expressions that we must have
+comp' (Add x y) c = (comp' x (comp' y (ADD c)))
 
-Both Just case:
-exec c ((Just (n+m)) : s)
-= {define data Code = ADD code, where ADD::Code -> Code
-   and define exec (ADD c) ((Just m) : (Just n) : s) = exec c (Just (n+m) : s),
-   unapply exec}
-exec (Add c) ((Just m) : (Just n) : s)
+Inductive case of Catch x h:
+exec (comp' (Catch x h) c) s
+= {apply eq 2}
+exec c (eval (Catch x h) : s)
+= {define data Code = CATCH Code, where CATCH :: Code -> Code
+   and define exec (CATCH x h) s = case (exec x s) of [Just n] -> exec x s
+   [Nothing] -> exec h s, applying eval leads to two cases}
 
-x is Nothing case:
-exec c (Nothing : s)
-= {define exec (ADD c) ((Just m) : Nothing : s) = exec c (Nothing : s),
-   unapply exec}
-exec (ADD c) ((Just m) : Nothing : s)
+case eval x = Just n
+exec c (eval x : s)
+= {unapply eq 2}
+exec (comp' x c) s
 
-y is Nothing case:
-exec c (Nothing : s)
-= {define exec (ADD c) (Nothing : (Just n) : s) = exec c (Nothing : s),
-   unapply exec}
-exec (ADD c) (Nothing : (Just n) : s)
+case eval x = Nothing
+exec c (eval h : s)
+= {unapply eq 2}
+exec (comp' h c) s
+
+So using the defined CATCH we get
+exec c (CATCH (comp' x c) (comp' h c))
+where we see from the initial expression that we have
+comp' ((Catch x h) c) s = CATCH (comp' x c) (comp' h c)
 
 
+The finally we consider comp :: Expr -> Code
+exec (comp e) s
+= {apply eq 1}
+eval e : s
+= {define data Code = HALT where HALT :: Code
+   and define exec HALT s = s}
+exec HALT (eval e : s)
+= {unapply eq 2}
+exec (comp' e HALT) s
+where we see from the initial expression that
+comp e = comp' e HALT
 
-With all these derivation we end up with:
+From all these derivation we finally have:
 -}
 
 
-data Code = PUSH Int Code | ADD Code
+data Code = PUSH Int Code
+          | ADD Code
+          | Catch Code
+          | HALT
           deriving Show
-comp :: Expr -> Code
 
+comp :: Expr -> Code
+comp e = comp' e HALT
 
 comp' :: Expr -> Code -> Code
 comp' (Val n) c = PUSH (Just n) c
-comp' Throw c = Nothing
+comp' Throw c = PUSH Nothing c
+comp' (Add x y) c = (comp' x (comp' y (ADD c)))
+comp' (Catch x h) c = CATCH (comp' x c) (comp' h c)
 
 
 exec :: Code -> Stack -> Stack
 exec (PUSH n c) s = exec c (n:s)
-
-exec (ADD c) ((Just m) : (Just n) : s) = exec c (Just (n+m) : s)
-exec (ADD c) ((Just m) : Nothing : s) = exec c (Nothing : s)
-exec (ADD c) (Nothing : (Just n) : s) = exec c (Nothing : s)
+exec (ADD c) (n:m:s) = exec c (((+) <*> n <*> m) : s
+exec (CATCH x h) s = case (exec x s) of
+                       [Just x] -> exec x s
+                       [Nothing] -> exec h s
+                      
 
